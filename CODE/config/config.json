@@ -1,0 +1,32 @@
+{
+    "name": "LSTM",
+    
+    "data":{
+        "data_folder": "data/",
+        "parse_path": "data/",
+        "one-hot": true
+    },
+
+    "dataloader":{
+        "batch_size": 64,
+        "shuffle": false
+    },
+    
+    "model":{
+        "name": "LSTM",
+        "save_dir": "save/",
+        "args":{
+            "vocab_size": 14,
+            "embed_size": 8,
+            "hidden_size": 512,
+            "num_layers": 2,
+            "dropout": 0.2,
+            "bidirectional": false
+        },
+        "train":{
+            "lr": 0.001,
+            "max_epochs": 100,
+            "early_stop": 10
+        }
+    }
+}
