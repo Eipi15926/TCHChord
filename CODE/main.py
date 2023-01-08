@@ -10,17 +10,19 @@ def main(config):
     # Data Parameter
     data_folder = config['data']['data_folder']
     parse_path = config['data']['parse_path']
+    filename = config['data']['filename']
     USE_ONEHOT = config['data']['one-hot']
 
     # parse
     '''
     这段可以挪到gen_dataset里面去
     '''
-    if os.path.exists(parse_path):
-        print(parse_path + 'already exists')
+    parse_file = os.path.join(parse_path, filename)
+    if os.path.exists(parse_file):
+        print(parse_file + ' already exists')
     else:
-        print('parse data to ' + parse_path)
-        parse(data_folder, parse_path)
+        print('parse data to ' + parse_file)
+        parse(config['data'])
     
     dataset = gen_dataset(config['data']) # transfer output.pkl
     dataloader = gen_dataloader(dataset, config['dataloader'])
