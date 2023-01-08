@@ -4,7 +4,8 @@
     "data":{
         "data_folder": "data/",
         "parse_path": "data/",
-        "one-hot": true
+        "filename": "output.pkl",
+        "one-hot": false
     },
 
     "dataloader":{
