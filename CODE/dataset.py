@@ -66,4 +66,3 @@ class MidiDataset(Dataset):
 if __name__ == '__main__':
     data_path = 'output.pkl'
     dataset = MidiDataset(data_path)
-    print(dataset.__getitem__(0))
