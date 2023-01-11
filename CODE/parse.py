@@ -85,27 +85,27 @@ def parse(config):
         filepath = os.path.join(data_folder, midi_file)
         try:
             melody_list, chord_list = parse_one_midi(filepath)
-        except FileNotFoundError:
+            all_files.append(midi_file)
+            all_melody.append(melody_list)
+            all_chords.append(chord_list)
+        except:
             print(f'Cannot parse {midi_file}')
-        
-        all_files.append(midi_file)
-        all_melody.append(melody_list)
-        all_chords.append(chord_list)
 
     # put into dictionary and send to pickle file
     harmony = {}
     harmony['file'] = all_files
     harmony['melody'] = all_melody
     harmony['chords'] = all_chords
-    print(harmony)
+    # print(harmony)
     
     pickle_file = os.path.join(parse_path, filename)
     with open(pickle_file, 'wb') as filepath:
         pickle.dump(harmony, filepath)
 
     print('MIDI Processing Completed.')
+    print(f'Totally parse {len(all_files)} files.')
         
 if __name__ == '__main__':
-    # config = {'data_folder': 'data/all_key', 'parse_path': 'data/parse_output', 'filename': 'output.pkl'}
-    config = {'data_folder': 'data/test_data', 'parse_path': 'data/parse_output', 'filename': 'output.pkl'}
+    config = {'data_folder': 'data/all_key', 'parse_path': 'data/parse_output', 'filename': 'output.pkl'}
+    # config = {'data_folder': 'data/test_data', 'parse_path': 'data/parse_output', 'filename': 'output.pkl'}
     parse(config)
