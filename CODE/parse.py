@@ -1,3 +1,4 @@
+# parse.py 实现将midi文件转化为12维和弦向量的功能
 from music21 import converter, note, chord, stream, meter, key, interval, pitch
 import os
 from tqdm import tqdm
