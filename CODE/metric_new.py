@@ -78,20 +78,13 @@ print(mapping(output))
 '''
 
 
-# to calculate accuracy in basic way:
-# data_arr: an array with 12 0-1 elements
-# acc: accuracy
-def chord_compare(data_arr, ans_arr):
-    same = 1
-    for i in range(0, 12):
-        if data_arr[i] != ans_arr[i]:
-            same = 0
-    return same
-
-
-# tot: total number of data
-def accuracy_calculation(data_arrs, ans_arrs, tot):
+# 输入每条旋律的两个12维向量的集合，输出该旋律的accuracy
+def evaluation(ans_arr,label_arr):
+    tot = len(label_arr)
     acc = 0
-    for i in range(0, tot):
-        acc = acc + chord_compare(data_arrs[i], ans_arrs[i])
-    return acc / tot
+    for i in range(0,tot):
+        ans_chord = mapping(ans_arr[i])
+        label_chord = mapping(label_arr[i])
+        if ans_chord == label_chord:
+            acc = acc + 1
+    return acc/tot
