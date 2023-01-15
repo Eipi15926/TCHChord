@@ -48,17 +48,18 @@ class LSTM(nn.Module):
             #self.fc = nn.Linear(hidden_size, num_classes) #这句是参考代码的实现
         
     def forward(self, data):
-        #x=data['melody'] #读取melody作为input
-        batch_size = len(data)
+        #没有分成批所以应该是单个序列跑的没有batch
+        #batch_size = data.size(0) #序列长度
+        #print(batch_size)
+        #print(data)
         #初始化一个h0,也即c0，在RNN中一个Cell输出的ht和Ct是相同的，而LSTM的一个cell输出的ht和Ct是不同的
-        #维度[layers, batch, hidden_len]
+        #维度[layers, hidden_len]
         if self.bidirectional: #因为不太确定BLSTM和LSTM的具体实现区别所以这块是直接保留了参考的代码的内容
-            h0 = torch.randn(self.num_layers*2, batch_size, self.hidden_size).to(device)
-            c0 = torch.randn(self.num_layers*2, batch_size, self.hidden_size).to(device)
+            h0 = torch.randn(self.num_layers*2, self.hidden_size).to(device)
+            c0 = torch.randn(self.num_layers*2, self.hidden_size).to(device)
         else:
-            h0 = torch.randn(self.num_layers, batch_size, self.hidden_size).to(device)
-            c0 = torch.randn(self.num_layers, batch_size, self.hidden_size).to(device)
-        #x = self.embedding(x)
+            h0 = torch.randn(self.num_layers, self.hidden_size).to(device)
+            c0 = torch.randn(self.num_layers, self.hidden_size).to(device)
         out,(_,_)= self.lstm(data, (h0,c0))
         output = self.hidden_network(out) 
         chord_out = torch.sigmoid(output) #最后用sigmoid输出概率
