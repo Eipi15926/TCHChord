@@ -52,7 +52,7 @@ def color_diff(chord_pre, chord_after):  # 和弦色差，默认三和弦
 
 
 def mapping(output_tensor):  # 这里output为12的向量,返回对应和弦在one_hot编码中的位置
-    output = output_tensor.numpy()
+    output = output_tensor.detach().numpy()
     shape = len(output)
     # 取最大三个值置1
     x = np.zeros(shape)
