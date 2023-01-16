@@ -27,25 +27,18 @@ def data_split(src_data_folder, target_data_folder, train_scale=0.8, val_scale=0
             pass
         else:
             os.mkdir(split_path)
-        # 然后在split_path的目录下创建类别文件夹
-        for class_name in class_names:
-            class_split_path = os.path.join(split_path, class_name)
-            if os.path.isdir(class_split_path):
-                pass
-            else:
-                os.mkdir(class_split_path)
 
     # 按照比例划分数据集，并进行数据的复制
     for class_name in class_names:
-        current_class_data_path = os.path.join(src_data_folder, class_name)
+        current_class_data_path = src_data_folder
         current_all_data = os.listdir(current_class_data_path)
         current_data_length = len(current_all_data)
         current_data_index_list = list(range(current_data_length))
         random.shuffle(current_data_index_list)
 
-        train_folder = os.path.join(os.path.join(target_data_folder, 'train'), class_name)
-        val_folder = os.path.join(os.path.join(target_data_folder, 'val'), class_name)
-        test_folder = os.path.join(os.path.join(target_data_folder, 'test'), class_name)
+        train_folder = os.path.join(target_data_folder, 'train')
+        val_folder = os.path.join(target_data_folder, 'val')
+        test_folder = os.path.join(target_data_folder, 'test')
         train_stop_flag = current_data_length * train_scale
         val_stop_flag = current_data_length * (train_scale + val_scale)
         current_idx = 0
@@ -75,7 +68,6 @@ def data_split(src_data_folder, target_data_folder, train_scale=0.8, val_scale=0
 
 
 if __name__ == '__main__':
-    # 请注意输入需要处理的数据集路径为..\\Data
-    src_data_folder = "..\\Data"
-    target_data_folder = "..\\classify"
+    src_data_folder = "..\\Data\\all_key"
+    target_data_folder = "..\\Data\\classify"
     data_split(src_data_folder, target_data_folder)
