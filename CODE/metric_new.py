@@ -51,10 +51,10 @@ def color_diff(chord_pre, chord_after):  # 和弦色差，默认三和弦
     return 2 / 3.14 * np.arctan(lamda * value)
 
 
-def mapping(output):  # 这里output为12的向量,返回对应和弦在onehot编码中的位置
+def mapping(output_tensor):  # 这里output为12的向量,返回对应和弦在one_hot编码中的位置
+    output = output_tensor.numpy()
     shape = len(output)
     # 取最大三个值置1
-
     x = np.zeros(shape)
     index = np.argpartition(output, -3)[-3:]
     x[index] = 1
