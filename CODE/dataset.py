@@ -4,7 +4,6 @@ import pandas as pd
 from torch.utils.data import Dataset
 from constants import NOTES_TO_INT, CHORD_TO_INT
 
-
 class MidiDataset(Dataset):
     NUM_NOTES = max(NOTES_TO_INT.values()) + 1
     NOTES_TO_INT = NOTES_TO_INT
