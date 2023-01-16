@@ -1,7 +1,7 @@
 import torch
-#import numpy as np
 import torch.nn as nn
-#from dataset import MidiDataset
+import torch.optim as optim
+from metric_new import evaluation
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") #这里保留的是参考代码的实现
 class LSTM(nn.Module):
@@ -36,7 +36,6 @@ class LSTM(nn.Module):
                 nn.Dropout(self.dropout),
                 nn.Linear(self.hidden_size,output_size), #两层hidden size不知道怎么设，先设了一个每次/2
                 nn.Tanh())
-            #self.fc = nn.Linear(hidden_size*2, num_classes) #这句是参考代码的实现
         else:
             self.hidden_network = nn.Sequential(
                 nn.Dropout(self.dropout),
@@ -45,7 +44,6 @@ class LSTM(nn.Module):
                 nn.Dropout(self.dropout),
                 nn.Linear(self.hidden_size/2,output_size),
                 nn.Tanh())
-            #self.fc = nn.Linear(hidden_size, num_classes) #这句是参考代码的实现
         
     def forward(self, data):
         #没有分成批所以应该是单个序列跑的没有batch
@@ -64,4 +62,33 @@ class LSTM(nn.Module):
         output = self.hidden_network(out) 
         chord_out = torch.sigmoid(output) #最后用sigmoid输出概率
         return chord_out
+
+    def train(self,train_loader,verify_loader, lr, MAX_EPOCH): 
+        #参数：train_loader是用来训练的数据集, verify是验证集, lr, Epoch数量
+        #论文提供的描述
+        # We use minibatch gradient descent with categorical cross entropy as the cost function and Adam as the optimize
+        criterion = nn.CrossEntropyLoss().to(device)
+        optimizer = optim.Adam(self.parameters(),lr)
+
+        for epoch in range(MAX_EPOCH):
+            for melody, chord in train_loader:
+                melody=melody.to(device)
+                chord=chord.to(device)
+                pred=self(melody)
+                loss=criterion(pred,chord)
+
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
         
+            print('Epoch: ','%04d'%(epoch+1),'loss = ','{:.6f}'.format(loss))
+            #verify, 输出一个平均正确率
+            avg=0
+            cnt=0
+            for melody, chord in verify_loader:
+                pred=self(melody)
+                avg=avg+evaluation(pred,chord) #调用验证函数
+                cnt=cnt+1
+            print('Verify set average accuracy:',avg/cnt)
+            print('')
+        return
