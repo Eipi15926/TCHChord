@@ -51,13 +51,13 @@ def color_diff(chord_pre, chord_after):  # 和弦色差，默认三和弦
     return 2 / 3.14 * np.arctan(lamda * value)
 
 
-lim_num = 3
-lim = -1234567
+# lim_num = 3
+# lim = -1234567
 
 
-def mapping(output_tensor):
-    # output = output_tensor.numpy()
-    output = output_tensor
+def mapping(output_tensor, lim_num, lim):
+    output = output_tensor.numpy()
+    # output = output_tensor
     x = np.zeros(len(output))
     for i in range(0,12):
         if output[i] > lim:
@@ -110,12 +110,14 @@ print(mapping2(output))
 
 
 # 输入每条旋律的两个12维向量的集合，输出该旋律的accuracy
-def evaluation(ans_arr,label_arr):
+def evaluation(ans_arr,label_arr, config):
+    lim_num = config['lim_num']
+    lim = config['lim']
     tot = len(label_arr)
     acc = 0
     for i in range(0,tot):
-        ans_chord = mapping(ans_arr[i])
-        label_chord = mapping(label_arr[i])
+        ans_chord = mapping(ans_arr[i], lim_num, lim)
+        label_chord = mapping(label_arr[i], lim_num, lim)
         if ans_chord == label_chord:
             acc = acc + 1
     return acc/tot
