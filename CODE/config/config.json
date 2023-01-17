@@ -3,8 +3,11 @@
     
     "data":{
         "data_folder": "data/",
+        "classify_folder": "data/classify",
         "parse_path": "data/",
-        "filename": "output.pkl",
+        "train_scale": 0.8,
+        "val_scale": 0.1,
+        "test_scale": 0.1,
         "one-hot": false
     },
 
@@ -17,12 +20,13 @@
         "name": "LSTM",
         "save_dir": "save/",
         "args":{
-            "vocab_size": 14,
+            "input_size": 12,
+            "output_size": 12,
             "embed_size": 8,
-            "hidden_size": 512,
+            "hidden_size": 128,
             "num_layers": 2,
             "dropout": 0.2,
-            "bidirectional": false
+            "bidirectional": true
         },
         "train":{
             "lr": 0.001,
