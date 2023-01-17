@@ -19,6 +19,7 @@
     "model":{
         "name": "LSTM",
         "save_dir": "save/",
+        "save_name": "mymodel.pt",
         "args":{
             "input_size": 12,
             "output_size": 12,
@@ -30,7 +31,7 @@
         },
         "train":{
             "lr": 0.001,
-            "max_epochs": 100,
+            "max_epochs": 10,
             "early_stop": 10
         },
         "metric":{
