@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from metric_new import evaluation
+from metric import evaluation
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") #这里保留的是参考代码的实现
 class LSTM(nn.Module):
@@ -19,17 +19,20 @@ class LSTM(nn.Module):
         super(LSTM, self).__init__()
         #self.vocab_size = vocab_size #如果需要对齐的话才需要用嵌入层？目前来说我们应该不需要？
         #self.embedding_dim = embedding_dim
-        config1=config["args"]
-        self.input_size = config1["input_size"]
-        self.hidden_size = config1["hidden_size"]
-        self.output_size = config1["output_size"]
-        self.num_layers = config1["num_layers"] #lstm层数
-        self.bidirectional = config1["bidirectional"] #是否是双向的
-        self.dropout = config1["dropout"]
+        self.eval_config=config['metric']
+        self.save_place = config['save_dir']+config['save_name']
 
-        config2=config["train"]
-        self.lr=config2["lr"]
-        self.max_epoch=config2["max_epochs"]
+        config1=config['args']
+        self.input_size = config1['input_size']
+        self.hidden_size = config1['hidden_size']
+        self.output_size = config1['output_size']
+        self.num_layers = config1['num_layers'] #lstm层数
+        self.bidirectional = config1['bidirectional'] #是否是双向的
+        self.dropout = config1['dropout']
+
+        config2=config['train']
+        self.lr=config2['lr']
+        self.max_epoch=config2['max_epochs']
 
         self.train_loader=train_loader
         self.verify_loader=verify_loader
@@ -74,7 +77,7 @@ class LSTM(nn.Module):
         chord_out = torch.sigmoid(output) #最后用sigmoid输出概率
         return chord_out
 
-    def train(self): 
+    def Train(self): 
         #参数：train_loader是用来训练的数据集, verify是验证集, lr, Epoch数量
         #论文提供的描述
         # We use minibatch gradient descent with categorical cross entropy as the cost function and Adam as the optimize
@@ -87,9 +90,13 @@ class LSTM(nn.Module):
         optimizer = optim.Adam(self.parameters(),lr)
 
         for epoch in range(MAX_EPOCH):
+            self.train()
             for melody, chord in train_loader:
+                melody=torch.tensor(melody).to(torch.float32)
+                chord=torch.tensor(chord).to(torch.float32)
                 melody=melody.to(device)
                 chord=chord.to(device)
+
                 pred=self(melody)
                 loss=criterion(pred,chord)
 
@@ -101,13 +108,19 @@ class LSTM(nn.Module):
             #verify, 输出一个平均正确率
             avg=0
             cnt=0
+            self.eval()
             for melody, chord in verify_loader:
+                melody=torch.tensor(melody).to(torch.float32)
+                chord=torch.tensor(chord).to(torch.float32)
+
                 pred=self(melody)
-                avg=avg+evaluation(pred,chord) #调用验证函数
+                avg=avg+evaluation(pred,chord,self.eval_config) #调用验证函数
                 cnt=cnt+1
             print('Verify set average accuracy:',avg/cnt)
             print('')
+        torch.save(self,self.save_place)
         return
+
 
 def gen_model(train_loader, verify_loader, test_loader, config):
     '''
