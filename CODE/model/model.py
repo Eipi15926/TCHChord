@@ -13,16 +13,27 @@ class LSTM(nn.Module):
     # dropout rate = 0.2
     # hidden_size = 128?
     # 是BLSTM所以应该 bidirectional = true
-    def __init__(self, input_size, hidden_size, output_size, num_layers, bidirectional, dropout):
+
+    #def __init__(self, input_size, hidden_size, output_size, num_layers, bidirectional, dropout):
+    def __init__(self, train_loader, verify_loader, test_loader, config):
         super(LSTM, self).__init__()
         #self.vocab_size = vocab_size #如果需要对齐的话才需要用嵌入层？目前来说我们应该不需要？
         #self.embedding_dim = embedding_dim
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.output_size = output_size
-        self.num_layers = num_layers #lstm层数
-        self.bidirectional = bidirectional #是否是双向的
-        self.dropout=dropout
+        config1=config["args"]
+        self.input_size = config1["input_size"]
+        self.hidden_size = config1["hidden_size"]
+        self.output_size = config1["output_size"]
+        self.num_layers = config1["num_layers"] #lstm层数
+        self.bidirectional = config1["bidirectional"] #是否是双向的
+        self.dropout = config1["dropout"]
+
+        config2=config["train"]
+        self.lr=config2["lr"]
+        self.max_epoch=config2["max_epochs"]
+
+        self.train_loader=train_loader
+        self.verify_loader=verify_loader
+        self.test_loader=test_loader
         
         #self.embedding = nn.Embedding(self.vocab_size, embedding_dim, padding_idx=word2idx['<PAD>'])
         self.lstm = nn.LSTM(input_size=self.input_size, hidden_size=self.hidden_size, batch_first=True, num_layers=self.num_layers, bidirectional=self.bidirectional)
@@ -34,7 +45,7 @@ class LSTM(nn.Module):
                 nn.Linear(self.hidden_size*2, self.hidden_size),
                 nn.Tanh(),
                 nn.Dropout(self.dropout),
-                nn.Linear(self.hidden_size,output_size), #两层hidden size不知道怎么设，先设了一个每次/2
+                nn.Linear(self.hidden_size,self.output_size), #两层hidden size不知道怎么设，先设了一个每次/2
                 nn.Tanh())
         else:
             self.hidden_network = nn.Sequential(
@@ -42,7 +53,7 @@ class LSTM(nn.Module):
                 nn.Linear(self.hidden_size, self.hidden_size/2),
                 nn.Tanh(),
                 nn.Dropout(self.dropout),
-                nn.Linear(self.hidden_size/2,output_size),
+                nn.Linear(self.hidden_size/2,self.output_size),
                 nn.Tanh())
         
     def forward(self, data):
@@ -63,10 +74,15 @@ class LSTM(nn.Module):
         chord_out = torch.sigmoid(output) #最后用sigmoid输出概率
         return chord_out
 
-    def train(self,train_loader,verify_loader, lr, MAX_EPOCH): 
+    def train(self): 
         #参数：train_loader是用来训练的数据集, verify是验证集, lr, Epoch数量
         #论文提供的描述
         # We use minibatch gradient descent with categorical cross entropy as the cost function and Adam as the optimize
+        train_loader=self.train_loader
+        verify_loader=self.verify_loader
+        lr=self.lr
+        MAX_EPOCH=self.max_epoch
+
         criterion = nn.CrossEntropyLoss().to(device)
         optimizer = optim.Adam(self.parameters(),lr)
 
@@ -92,3 +108,10 @@ class LSTM(nn.Module):
             print('Verify set average accuracy:',avg/cnt)
             print('')
         return
+
+def gen_model(train_loader, verify_loader, test_loader, config):
+    '''
+    args: train_loader, verify_loader, test_loader, config
+    '''
+    model=LSTM(train_loader, verify_loader, test_loader, config)
+    return model
