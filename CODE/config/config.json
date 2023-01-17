@@ -20,9 +20,10 @@
         "name": "LSTM",
         "save_dir": "save/",
         "args":{
-            "vocab_size": 14,
+            "input_size": 12,
+            "output_size": 12,
             "embed_size": 8,
-            "hidden_size": 512,
+            "hidden_size": 128,
             "num_layers": 2,
             "dropout": 0.2,
             "bidirectional": true
