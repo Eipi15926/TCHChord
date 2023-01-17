@@ -4,6 +4,7 @@ import pandas as pd
 from torch.utils.data import Dataset
 from constants import NOTES_TO_INT, CHORD_TO_INT
 
+
 class MidiDataset(Dataset):
     NUM_NOTES = max(NOTES_TO_INT.values()) + 1
     NOTES_TO_INT = NOTES_TO_INT
@@ -13,22 +14,27 @@ class MidiDataset(Dataset):
     SEQUENCE_LENGTH = 16
     USE_CHORD_ONEHOT = False  # 暂时按照binary先写
 
-    def __init__(self, path, transform=None, target_transform=None):
-        assert os.path.exists(path), "{} does not exist".format(path)
-        if not path.endswith('.pkl'):
-            raise IOError('{} is not a recoginizable file type (.pkl)'.format(path))
+    def __init__(self, config):
+        data_path = config['data_path']
+        transform = config['transform']
+        target_transform = config['target_transform']
+        use_one_hot = config['use_one_hot']
+
+        assert os.path.exists(data_path), "{} does not exist".format(data_path)
+        if not data_path.endswith('.pkl'):
+            raise IOError('{} is not a recoginizable file type (.pkl)'.format(data_path))
 
         # load data
-        with open(path, 'rb') as f:
+        with open(data_path, 'rb') as f:
             data_dict = pickle.load(f)
             self.df = pd.DataFrame.from_dict(data_dict)
             self.transform = transform
             f.close()
 
-        if self.USE_CHORD_ONEHOT:
+        if use_one_hot:
             self.chord_converter = self.convert_binary_to_onehot
 
-        self.path = path
+        self.path = data_path
         self.transform = transform
         self.target_transform = target_transform
 
@@ -63,5 +69,5 @@ class MidiDataset(Dataset):
 
 
 if __name__ == '__main__':
-    data_path = 'output.pkl'
-    dataset = MidiDataset(data_path)
+    config = {'data_path': 'data/parse_output/train.pkl', 'transform': None, 'target_transform': None, 'use_one_hot': False}
+    MidiDataset(config)
