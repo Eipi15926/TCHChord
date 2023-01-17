@@ -25,7 +25,7 @@ def data_split(src_data_folder, target_data_folder, train_scale=0.8, val_scale=0
         if os.path.isdir(split_path):
             pass
         else:
-            os.mkdir(split_path)
+            os.makedirs(split_path)
 
     # 按照比例划分数据集，并进行数据的复制
     current_all_data = os.listdir(src_data_folder)
