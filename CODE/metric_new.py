@@ -50,9 +50,39 @@ def color_diff(chord_pre, chord_after):  # 和弦色差，默认三和弦
                 value = value + np.abs(color_process(value_list[i] - value_list[j]))
     return 2 / 3.14 * np.arctan(lamda * value)
 
+lim_num = 5
+lim = -1234567
 
-def mapping(output_tensor):  # 这里output为12的向量,返回对应和弦在one_hot编码中的位置
-    output = output_tensor.numpy()
+def mapping(output_tensor):
+    # output = output_tensor.numpy()
+    output = output_tensor
+    x = np.zeros(len(output))
+    for i in range(0,12):
+        if output[i] > lim:
+            x[i] = 1
+        else:
+            x[i] = 0
+    index = np.argpartition(output, -lim_num)[-lim_num:]
+    for i in range(0,12):
+        if x[i] == 1:
+            tmp = 0
+            for j in range(0,lim_num):
+                if i == index[j]:
+                    tmp = 1
+            x[i] = tmp
+    # print(x)
+    dist_list = []
+    for k in range(24):
+        dist_list.append(color_diff(x, chord_list[k, :]))
+    output_index = np.argmin(dist_list) + 2
+    # print(dist_list)
+    return output_index
+
+
+'''
+def mapping2(output_tensor):  # 这里output为12的向量,返回对应和弦在one_hot编码中的位置
+    #output = output_tensor.numpy()
+    output = output_tensor
     shape = len(output)
     # 取最大三个值置1
     x = np.zeros(shape)
@@ -63,10 +93,9 @@ def mapping(output_tensor):  # 这里output为12的向量,返回对应和弦在o
     for j in range(24):
         dist_list.append(color_diff(output, chord_list[j, :]))
     output_index = np.argmin(dist_list) + 2
+    print("mapping2",dist_list)
     return np.array(output_index)
 
-
-'''
 Cmajor_chord = np.array([1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0])
 Gmajor_chord = np.array([0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1])
 Gseven_chord = np.array([0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1])
@@ -75,8 +104,8 @@ output = np.array([-1, 3, 5, 1, 7, -4, 2, 8, 0, 3, 9, 0])
 print(color_diff(Cmajor_chord, Gmajor_chord))
 print(color_diff(Cmajor_chord, Gseven_chord))
 print(mapping(output))
+print(mapping2(output))
 '''
-
 
 # 输入每条旋律的两个12维向量的集合，输出该旋律的accuracy
 def evaluation(ans_arr,label_arr):
