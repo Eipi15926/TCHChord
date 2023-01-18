@@ -3,7 +3,7 @@
     "data": {
         "data_folder": "data/",
         "classify_folder": "data/classify",
-        "parse_path": "data/",
+        "parse_path": "data/parse_output",
         "train_scale": 0.8,
         "val_scale": 0.1,
         "test_scale": 0.1,
