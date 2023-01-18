@@ -2,7 +2,7 @@ import os
 import pickle
 import pandas as pd
 from torch.utils.data import Dataset
-from constants import NOTES_TO_INT, CHORD_TO_INT
+from data_loader.constants import NOTES_TO_INT, CHORD_TO_INT
 
 
 class MidiDataset(Dataset):

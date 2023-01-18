@@ -1,4 +1,4 @@
-from dataset import MidiDataset
+from data_loader.dataset import MidiDataset
 from torch.utils.data import DataLoader
 
 

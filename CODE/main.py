@@ -2,9 +2,9 @@ import torch
 import json
 import argparse
 import os
-from parser.parse import parse
+from parse.parse import parse
 from data_loader.classify import data_split
-from data_loader.dataset import MidiDataset
+# from data_loader.dataset import MidiDataset
 from data_loader.dataloader import MidiDataLoader
 from model.model import gen_model
 
