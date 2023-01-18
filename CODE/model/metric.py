@@ -17,7 +17,7 @@ for i in range(12):
     chord_list.append(chord_minor)
 
 chord_list = torch.tensor(chord_list)
-print(chord_list)
+# print(chord_list)
 
 def color_process(color):  # 色差不在-6到6内
     if color > 6:
@@ -35,14 +35,14 @@ def chord_color(chord):  # 和弦色彩
 
 
 def color_diff(chord_pre, chord_after):  # 和弦色差，默认三和弦
-    lamda = 1 / 54
+    lamda = torch.tensor(1 / 54)
     value_list = torch.tensor([0, -5, 2, -3, 4, -1, 6, 1, -4, 3, -2, 5])
     color_pre = chord_color(chord_pre)
     color_after = chord_color(chord_after)
     color_diff = color_process(color_after - color_pre)
     chord_pre_new = torch.maximum(chord_pre - chord_after, torch.zeros(12))
     chord_after_new = torch.maximum(chord_after - chord_pre, torch.zeros(12))
-    value = 0
+    value = torch.tensor(0)
     for i in range(12):
         for j in range(12):
             if chord_pre_new[i] == 1 and chord_after_new[j] == 1:

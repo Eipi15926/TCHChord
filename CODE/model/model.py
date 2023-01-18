@@ -118,6 +118,10 @@ class LSTM(nn.Module):
                 pred=self(melody)
                 avg=avg+evaluation(pred,chord,self.eval_config) #调用验证函数
                 cnt=cnt+1
+                
+                if cnt % 100 == 0:
+                    print(f'count: {cnt}')
+                
             print('Verify set average accuracy:',avg/cnt)
             print('')
         torch.save(self,self.save_place)
