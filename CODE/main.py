@@ -19,7 +19,7 @@ def main(config):
     train_scale = config['data']['train_scale']
     val_scale = config['data']['train_scale']
     test_scale = config['data']['test_scale']
-    USE_ONEHOT = config['data']['one-hot']
+    # USE_ONEHOT = config['data']['use_one_hot']
 
     # parse
     '''
@@ -57,7 +57,7 @@ def main(config):
                       verify_loader,
                       test_loader,
                       config=config['model'])
-    model.train()
+    model.Train()
 
 # predict chord output and evaluate model by predict.py
 

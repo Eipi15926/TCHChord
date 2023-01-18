@@ -13,7 +13,7 @@
         "name": "MidiDataLoader",
         "args": {
             "data_path": "data/parse_output/train.pkl",
-            "batch_size": 2,
+            "batch_size": 1,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 0
@@ -23,7 +23,7 @@
         "name": "MidiDataLoader",
         "args": {
             "data_path": "data/parse_output/test.pkl",
-            "batch_size": 64,
+            "batch_size": 1,
             "shuffle": false,
             "validation_split": 0.0,
             "num_workers": 0
@@ -33,14 +33,14 @@
         "name": "MidiDataLoader",
         "args": {
             "data_path": "data/parse_output/val.pkl",
-            "batch_size": 64,
+            "batch_size": 1,
             "shuffle": false,
             "validation_split": 0.0,
             "num_workers": 0
         }
     },
     "dataloader": {
-        "batch_size": 64,
+        "batch_size": 1,
         "shuffle": false
     },
     "model": {
@@ -63,7 +63,7 @@
         },
         "metric": {
             "lim_num": 3,
-            "lim": 0.5
+            "lim": 0
         }
     }
 }
