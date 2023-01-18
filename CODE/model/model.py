@@ -33,6 +33,7 @@ class LSTM(nn.Module):
         config2=config['train']
         self.lr=config2['lr']
         self.max_epoch=config2['max_epochs']
+        self.early_stop = config2['early_stop']
 
         self.train_loader=train_loader
         self.verify_loader=verify_loader
@@ -89,6 +90,8 @@ class LSTM(nn.Module):
         criterion = nn.CrossEntropyLoss().to(device)
         optimizer = optim.Adam(self.parameters(),lr)
 
+        stop_cnt=0
+        pre_acc=0
         for epoch in range(MAX_EPOCH):
             self.train()
             for melody, chord in train_loader:
@@ -124,6 +127,13 @@ class LSTM(nn.Module):
                 
             print('Verify set average accuracy:',avg/cnt)
             print('')
+            if (epoch>1)&(pre_acc>avg/cnt):
+                stop_cnt=stop_cnt+1
+                if stop_cnt>=self.early_stop:
+                    break
+            else:
+                stop_cnt=0
+            pre_acc=avg/cnt
         torch.save(self,self.save_place)
         return
 
