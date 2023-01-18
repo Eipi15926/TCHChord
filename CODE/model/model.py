@@ -112,6 +112,8 @@ class LSTM(nn.Module):
             for melody, chord in verify_loader:
                 melody=torch.tensor(melody).to(torch.float32)
                 chord=torch.tensor(chord).to(torch.float32)
+                melody = melody.to(device)
+                chord = chord.to(device)
 
                 pred=self(melody)
                 avg=avg+evaluation(pred,chord,self.eval_config) #调用验证函数
@@ -127,4 +129,4 @@ def gen_model(train_loader, verify_loader, test_loader, config):
     args: train_loader, verify_loader, test_loader, config
     '''
     model=LSTM(train_loader, verify_loader, test_loader, config)
-    return model
+    return model.to(device)

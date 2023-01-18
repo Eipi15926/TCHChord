@@ -86,11 +86,14 @@ def parse(config):
         filepath = os.path.join(data_folder, midi_file)
         try:
             melody_list, chord_list = parse_one_midi(filepath)
+            if len(melody_list) != len(chord_list):
+                continue
             all_files.append(midi_file)
             all_melody.append(melody_list)
             all_chords.append(chord_list)
         except:
-            print(f'Cannot parse {midi_file}')
+            # print(f'Cannot parse {midi_file}')
+            pass
 
     # put into dictionary and send to pickle file
     harmony = {}

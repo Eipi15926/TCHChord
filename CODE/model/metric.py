@@ -32,6 +32,8 @@ def color_process(color):  # 色差不在-6到6内
 
 def chord_color(chord):  # 和弦色彩
     value_list = np.array([0, -5, 2, -3, 4, -1, 6, 1, -4, 3, -2, 5])
+    print(sum(value_list * chord))
+    print(sum(chord))
     return np.sum(value_list * chord) / np.sum(chord)
 
 
@@ -56,7 +58,7 @@ def color_diff(chord_pre, chord_after):  # 和弦色差，默认三和弦
 
 
 def mapping(output_tensor, lim_num, lim):
-    output = output_tensor.detach().numpy()
+    output = output_tensor.detach().cpu().numpy()
     # output = output_tensor
     x = np.zeros(len(output))
     for i in range(0,12):

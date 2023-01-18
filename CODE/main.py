@@ -47,7 +47,6 @@ def main(config):
         config_parse_test['filename'] = 'test.pkl'
         parse(config_parse_val)
         
-        
     
     # dataset = gen_dataset(config['data']) # transfer output.pkl dataloader直接调用dataset
     train_loader = MidiDataLoader(config['train_data_loader']['args'])
