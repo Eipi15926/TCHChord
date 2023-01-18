@@ -1,12 +1,11 @@
-import numpy as np
-
+import torch
 chord_list = []
 
 # 生成和弦向量表
 start = 9
 for i in range(12):
-    chord_major = np.zeros(12)
-    chord_minor = np.zeros(12)
+    chord_major = [0,0,0,0,0,0,0,0,0,0,0,0]
+    chord_minor = [0,0,0,0,0,0,0,0,0,0,0,0]
     chord_major[start] = 1
     chord_major[(start + 4) % 12] = 1
     chord_major[(start + 7) % 12] = 1
@@ -17,10 +16,8 @@ for i in range(12):
     chord_list.append(chord_major)
     chord_list.append(chord_minor)
 
-chord_list = np.array(chord_list)
-
-
-# print(chord_list)
+chord_list = torch.tensor(chord_list)
+print(chord_list)
 
 def color_process(color):  # 色差不在-6到6内
     if color > 6:
@@ -31,26 +28,26 @@ def color_process(color):  # 色差不在-6到6内
 
 
 def chord_color(chord):  # 和弦色彩
-    value_list = np.array([0, -5, 2, -3, 4, -1, 6, 1, -4, 3, -2, 5])
-    print(sum(value_list * chord))
-    print(sum(chord))
-    return np.sum(value_list * chord) / np.sum(chord)
+    value_list = torch.tensor([0, -5, 2, -3, 4, -1, 6, 1, -4, 3, -2, 5])
+    # print(torch.sum(value_list * chord))
+    # print(torch.sum(chord))
+    return torch.sum(value_list * chord) / torch.sum(chord)
 
 
 def color_diff(chord_pre, chord_after):  # 和弦色差，默认三和弦
     lamda = 1 / 54
-    value_list = np.array([0, -5, 2, -3, 4, -1, 6, 1, -4, 3, -2, 5])
+    value_list = torch.tensor([0, -5, 2, -3, 4, -1, 6, 1, -4, 3, -2, 5])
     color_pre = chord_color(chord_pre)
     color_after = chord_color(chord_after)
     color_diff = color_process(color_after - color_pre)
-    chord_pre_new = np.maximum(chord_pre - chord_after, 0)
-    chord_after_new = np.maximum(chord_after - chord_pre, 0)
+    chord_pre_new = torch.maximum(chord_pre - chord_after, torch.zeros(12))
+    chord_after_new = torch.maximum(chord_after - chord_pre, torch.zeros(12))
     value = 0
     for i in range(12):
         for j in range(12):
             if chord_pre_new[i] == 1 and chord_after_new[j] == 1:
-                value = value + np.abs(color_process(value_list[i] - value_list[j]))
-    return 2 / 3.14 * np.arctan(lamda * value)
+                value = value + torch.abs(color_process(value_list[i] - value_list[j]))
+    return 2 / 3.14 * torch.arctan(lamda * value)
 
 
 # lim_num = 3
@@ -60,13 +57,14 @@ def color_diff(chord_pre, chord_after):  # 和弦色差，默认三和弦
 def mapping(output_tensor, lim_num, lim):
     output = output_tensor.detach().cpu().numpy()
     # output = output_tensor
-    x = np.zeros(len(output))
+    x = torch.zeros(len(output))
     for i in range(0,12):
         if output[i] > lim:
             x[i] = 1
         else:
             x[i] = 0
-    index = np.argpartition(output, -lim_num)[-lim_num:]
+    a, idx1 = torch.sort(output, descending=True)
+    index = idx1[:lim_num] # 前lim_sum大的数的索引
     for i in range(0,12):
         if x[i] == 1:
             tmp = 0
@@ -76,9 +74,11 @@ def mapping(output_tensor, lim_num, lim):
             x[i] = tmp
     # print(x)
     dist_list = []
+    if torch.sum(x) == 0:
+        return 0
     for k in range(24):
         dist_list.append(color_diff(x, chord_list[k, :]))
-    output_index = np.argmin(dist_list) + 2
+    output_index = torch.argmin(torch.tensor(dist_list)) + 2
     # print(dist_list)
     return output_index
 
