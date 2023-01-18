@@ -55,7 +55,7 @@ def color_diff(chord_pre, chord_after):  # 和弦色差，默认三和弦
 
 
 def mapping(output_tensor, lim_num, lim):
-    output = output_tensor.detach().cpu().numpy()
+    output = output_tensor.detach()
     # output = output_tensor
     x = torch.zeros(len(output))
     for i in range(0,12):
