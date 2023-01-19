@@ -23,7 +23,8 @@ class MidiDataLoader(DataLoader):
             'dataset': midi_dataset,
             'batch_size': batch_size,
             'shuffle': self.shuffle,
-            'num_workers': num_workers
+            'num_workers': num_workers,
+            'drop_last': True
         }
         super(MidiDataLoader, self).__init__(**self.init_kwargs)
 

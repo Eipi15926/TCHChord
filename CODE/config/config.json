@@ -13,7 +13,7 @@
         "name": "MidiDataLoader",
         "args": {
             "data_path": "data/parse_output/train.pkl",
-            "batch_size": 1,
+            "batch_size": 64,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 0,
@@ -61,12 +61,12 @@
         },
         "train": {
             "lr": 0.001,
-            "max_epochs": 10,
-            "early_stop": 10
+            "max_epochs": 100,
+            "early_stop": 100
         },
         "metric": {
             "lim_num": 3,
-            "lim": 0
+            "lim": 0.5
         }
     }
 }

@@ -155,3 +155,18 @@ def evaluation(ans_arr,label_arr, config):
         if ans_chord == label_chord:
             acc = acc + 1
     return acc/tot
+
+def evaluation_simple(output_arr, label_arr, config):
+    lim_num = config['lim_num']
+    lim = config['lim']
+    output_arr = output_arr.detach().reshape(-1, output_arr.shape[-1])
+    label_arr = label_arr.detach().reshape(-1, label_arr.shape[-1])
+    tot = len(label_arr)
+    acc = 0
+    for c, label in zip(output_arr, label_arr):
+        ans_chord = (c > lim)
+        acc += (ans_chord == label).sum() / 12
+    return acc / tot
+
+if __name__ == '__main__':
+    output = [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0]

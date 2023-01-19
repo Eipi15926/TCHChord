@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from model.metric import evaluation
-# from model.metric import evaluation_simple
+from model.metric import evaluation_simple
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") #这里保留的是参考代码的实现
 class LSTM(nn.Module):
@@ -44,11 +44,14 @@ class LSTM(nn.Module):
         self.train_loader=train_loader
         self.verify_loader=verify_loader
         self.test_loader=test_loader
-        
         self.batch_size = train_loader.batch_size
         
         #self.embedding = nn.Embedding(self.vocab_size, embedding_dim, padding_idx=word2idx['<PAD>'])
-        self.lstm = nn.LSTM(input_size=self.input_size, hidden_size=self.hidden_size, batch_first=True, num_layers=self.num_layers, bidirectional=self.bidirectional)
+        self.lstm = nn.LSTM(input_size=self.input_size, 
+                            hidden_size=self.hidden_size, 
+                            batch_first=True, 
+                            num_layers=self.num_layers, 
+                            bidirectional=self.bidirectional)
 
         #论文参数：hidden layer是两层, 激活函数是tanh
         if self.bidirectional: #因为不确定BLSTM和LSTM实现上的区别，所以这里保留了参考的代码的写法
@@ -102,6 +105,7 @@ class LSTM(nn.Module):
         pre_acc=0
         for epoch in range(MAX_EPOCH):
             self.train()
+            self.batch_size = self.train_loader.batch_size
             for melody, chord in train_loader:
                 # melody=torch.tensor(melody).to(torch.float32)
                 # chord=torch.tensor(chord).to(torch.float32)
@@ -118,13 +122,15 @@ class LSTM(nn.Module):
                 optimizer.step()
         
             print('Epoch: ','%04d'%(epoch+1),'loss = ','{:.6f}'.format(loss))
+            
             #verify, 输出一个平均正确率
             avg=0
             cnt=0
+            self.batch_size = self.verify_loader.batch_size
             self.eval()
             for melody, chord in verify_loader:
-                melody=torch.tensor(melody).to(torch.float32)
-                chord=torch.tensor(chord).to(torch.float32)
+                # melody=torch.tensor(melody).to(torch.float32)
+                # chord=torch.tensor(chord).to(torch.float32)
                 melody = melody.to(device)
                 chord = chord.to(device)
 
@@ -150,10 +156,11 @@ class LSTM(nn.Module):
     def test(self):
         avg = 0
         cnt = 0
+        self.batch_size = self.test_loader.batch_size
         self.eval()
         for melody, chord in self.test_loader:
-            melody=torch.tensor(melody).to(torch.float32)
-            chord=torch.tensor(chord).to(torch.float32)
+            # melody=torch.tensor(melody).to(torch.float32)
+            # chord=torch.tensor(chord).to(torch.float32)
             melody = melody.to(device)
             chord = chord.to(device)
 
