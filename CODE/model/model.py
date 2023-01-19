@@ -1,7 +1,9 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from model.metric import evaluation
+from model.metric import evaluation_simple
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") #这里保留的是参考代码的实现
 class LSTM(nn.Module):
@@ -21,6 +23,10 @@ class LSTM(nn.Module):
         #self.embedding_dim = embedding_dim
         self.eval_config=config['metric']
         self.save_place = config['save_dir']+config['save_name']
+        if os.path.exists(self.save_place):
+            pass
+        else:
+            os.makedirs(self.save_place)
 
         config1=config['args']
         self.input_size = config1['input_size']
@@ -119,7 +125,7 @@ class LSTM(nn.Module):
                 chord = chord.to(device)
 
                 pred=self(melody)
-                avg=avg+evaluation(pred,chord,self.eval_config) #调用验证函数
+                avg=avg+evaluation_simple(pred,chord,self.eval_config) #调用验证函数
                 cnt=cnt+1
                 
                 if cnt % 100 == 0:
@@ -137,6 +143,22 @@ class LSTM(nn.Module):
         torch.save(self,self.save_place)
         return
 
+    def test(self):
+        self.eval()
+        for melody, chord in self.test_loader:
+            melody=torch.tensor(melody).to(torch.float32)
+            chord=torch.tensor(chord).to(torch.float32)
+            melody = melody.to(device)
+            chord = chord.to(device)
+
+            pred=self(melody)
+            avg=avg+evaluation(pred,chord,self.eval_config) #调用验证函数
+            cnt=cnt+1
+
+            # if cnt % 100 == 0:
+            #     print(f'count: {cnt}')
+        print('Test set average accuracy:',avg/cnt)
+        return
 
 def gen_model(train_loader, verify_loader, test_loader, config):
     '''
