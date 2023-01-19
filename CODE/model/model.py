@@ -128,8 +128,8 @@ class LSTM(nn.Module):
                 avg=avg+evaluation_simple(pred,chord,self.eval_config) #调用验证函数
                 cnt=cnt+1
                 
-                if cnt % 100 == 0:
-                    print(f'count: {cnt}')
+                # if cnt % 100 == 0:
+                #     print(f'count: {cnt}')
                 
             print('Verify set average accuracy:',avg/cnt)
             print('')
@@ -144,6 +144,8 @@ class LSTM(nn.Module):
         return
 
     def test(self):
+        avg = 0
+        cnt = 0
         self.eval()
         for melody, chord in self.test_loader:
             melody=torch.tensor(melody).to(torch.float32)

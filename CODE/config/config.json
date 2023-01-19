@@ -16,7 +16,8 @@
             "batch_size": 1,
             "shuffle": true,
             "validation_split": 0.1,
-            "num_workers": 0
+            "num_workers": 0,
+            "batch_len": 32
         }
     },
     "test_data_loader": {
@@ -26,7 +27,8 @@
             "batch_size": 1,
             "shuffle": false,
             "validation_split": 0.0,
-            "num_workers": 0
+            "num_workers": 0,
+            "batch_len": 0
         }
     },
     "val_data_loader": {
@@ -36,7 +38,8 @@
             "batch_size": 1,
             "shuffle": false,
             "validation_split": 0.0,
-            "num_workers": 0
+            "num_workers": 0,
+            "batch_len": 0
         }
     },
     "dataloader": {

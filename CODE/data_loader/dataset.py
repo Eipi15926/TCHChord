@@ -2,7 +2,8 @@ import os
 import pickle
 import pandas as pd
 from torch.utils.data import Dataset
-from data_loader.constants import NOTES_TO_INT, CHORD_TO_INT
+# from data_loader.constants import NOTES_TO_INT, CHORD_TO_INT
+from constants import NOTES_TO_INT, CHORD_TO_INT
 
 
 class MidiDataset(Dataset):
@@ -19,6 +20,7 @@ class MidiDataset(Dataset):
         transform = config['transform']
         target_transform = config['target_transform']
         use_one_hot = config['use_one_hot']
+        batch_len = config['batch_len']
 
         assert os.path.exists(data_path), "{} does not exist".format(data_path)
         if not data_path.endswith('.pkl'):
@@ -37,6 +39,7 @@ class MidiDataset(Dataset):
         self.path = data_path
         self.transform = transform
         self.target_transform = target_transform
+        self.batch_len = batch_len
 
     def __getitem__(self, idx):
         row = self.df.iloc[idx]
@@ -49,6 +52,9 @@ class MidiDataset(Dataset):
             melody = self.transform(melody)
         if self.target_transform:
             chord = self.target_transform(chord)
+        if self.batch_len:
+            melody = self.align(melody, self.batch_len)
+            chord = self.align(chord, self.batch_len)
 
         return melody, chord
 
@@ -67,7 +73,31 @@ class MidiDataset(Dataset):
 
         return note_list
 
+    @classmethod
+    def align(cls, data, batch_len):
+        if len(data) > batch_len:
+            return data[0:batch_len]
+        else:
+            for i in range(batch_len - len(data)):
+                data.append([0]*12)
+            return data
 
 if __name__ == '__main__':
-    config = {'data_path': 'data/parse_output/train.pkl', 'transform': None, 'target_transform': None, 'use_one_hot': False}
-    MidiDataset(config)
+    config = {'data_path': 'data/parse_output/train.pkl', 'batch_len':32, 'transform': None, 'target_transform': None, 'use_one_hot': False}
+    train_dataset = MidiDataset(config)
+    scoreboard = {}
+    cnt = 0
+    for data in train_dataset:
+        if cnt % 1000 == 0:
+            print(f'count: {cnt}')
+        melody, chord = data
+        length = len(melody)
+        # index = int(length // 10)
+        index = length
+        if index in scoreboard.keys():
+            scoreboard[index] += 1
+        else:
+            scoreboard[index] = 1
+        cnt += 1
+        
+    print(scoreboard)
