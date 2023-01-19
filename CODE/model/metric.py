@@ -147,6 +147,8 @@ print(mapping2(output))
 def evaluation(ans_arr,label_arr, config):
     lim_num = config['lim_num']
     lim = config['lim']
+    ans_arr=ans_arr.detach().reshape(-1,ans_arr.shape[-1])
+    label_arr=label_arr.detach().reshape(-1,label_arr.shape[-1])
     tot = len(label_arr)
     acc = 0
     for i in range(0,tot):
