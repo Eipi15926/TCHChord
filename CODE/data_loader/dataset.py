@@ -2,8 +2,9 @@ import os
 import pickle
 import pandas as pd
 from torch.utils.data import Dataset
-# from data_loader.constants import NOTES_TO_INT, CHORD_TO_INT
-from constants import NOTES_TO_INT, CHORD_TO_INT
+import torch
+from data_loader.constants import NOTES_TO_INT, CHORD_TO_INT
+# from constants import NOTES_TO_INT, CHORD_TO_INT
 
 
 class MidiDataset(Dataset):
@@ -47,7 +48,7 @@ class MidiDataset(Dataset):
         # 三层列表，曲子旋律小节，曲子略去
         melody = row['melody']
         chord = row['chords']
-
+        
         if self.transform:
             melody = self.transform(melody)
         if self.target_transform:
@@ -55,6 +56,9 @@ class MidiDataset(Dataset):
         if self.batch_len:
             melody = self.align(melody, self.batch_len)
             chord = self.align(chord, self.batch_len)
+        
+        melody = torch.FloatTensor(melody)
+        chord = torch.FloatTensor(chord)
 
         return melody, chord
 

@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from model.metric import evaluation
-from model.metric import evaluation_simple
+# from model.metric import evaluation_simple
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") #这里保留的是参考代码的实现
 class LSTM(nn.Module):
@@ -45,6 +45,8 @@ class LSTM(nn.Module):
         self.verify_loader=verify_loader
         self.test_loader=test_loader
         
+        self.batch_size = train_loader.batch_size
+        
         #self.embedding = nn.Embedding(self.vocab_size, embedding_dim, padding_idx=word2idx['<PAD>'])
         self.lstm = nn.LSTM(input_size=self.input_size, hidden_size=self.hidden_size, batch_first=True, num_layers=self.num_layers, bidirectional=self.bidirectional)
 
@@ -74,11 +76,11 @@ class LSTM(nn.Module):
         #初始化一个h0,也即c0，在RNN中一个Cell输出的ht和Ct是相同的，而LSTM的一个cell输出的ht和Ct是不同的
         #维度[layers, hidden_len]
         if self.bidirectional: #因为不太确定BLSTM和LSTM的具体实现区别所以这块是直接保留了参考的代码的内容
-            h0 = torch.randn(self.num_layers*2, self.hidden_size).to(device)
-            c0 = torch.randn(self.num_layers*2, self.hidden_size).to(device)
+            h0 = torch.randn(self.num_layers*2, self.batch_size, self.hidden_size).to(device)
+            c0 = torch.randn(self.num_layers*2, self.batch_size, self.hidden_size).to(device)
         else:
-            h0 = torch.randn(self.num_layers, self.hidden_size).to(device)
-            c0 = torch.randn(self.num_layers, self.hidden_size).to(device)
+            h0 = torch.randn(self.num_layers, self.batch_size, self.hidden_size).to(device)
+            c0 = torch.randn(self.num_layers, self.batch_size, self.hidden_size).to(device)
         out,(_,_)= self.lstm(data, (h0,c0))
         output = self.hidden_network(out) 
         chord_out = torch.sigmoid(output) #最后用sigmoid输出概率
@@ -101,8 +103,10 @@ class LSTM(nn.Module):
         for epoch in range(MAX_EPOCH):
             self.train()
             for melody, chord in train_loader:
-                melody=torch.tensor(melody).to(torch.float32)
-                chord=torch.tensor(chord).to(torch.float32)
+                # melody=torch.tensor(melody).to(torch.float32)
+                # chord=torch.tensor(chord).to(torch.float32)
+                # melody = torch.tensor(melody)
+                # chord = torch.tensor(chord)
                 melody=melody.to(device)
                 chord=chord.to(device)
 

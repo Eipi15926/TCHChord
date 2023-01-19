@@ -1,4 +1,5 @@
 from data_loader.dataset import MidiDataset
+# from dataset import MidiDataset
 from torch.utils.data import DataLoader
 
 
@@ -28,5 +29,10 @@ class MidiDataLoader(DataLoader):
 
 
 if __name__ == '__main__':
-    config = {'data_path': 'output.pkl', 'batch_size': 2, 'shuffle': True, 'validation_split': 0.1, 'num_workers': 0}
-    MidiDataLoader(config)
+    config = {'data_path': 'output.pkl', 'batch_size': 2, 'batch_len': 32, 'shuffle': True, 'validation_split': 0.1, 'num_workers': 0}
+    loader = MidiDataLoader(config)
+    print(loader.batch_size)
+    exit()
+    for melody, chord in loader:
+        print(melody)
+        exit()
