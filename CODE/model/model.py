@@ -26,7 +26,7 @@ class LSTM(nn.Module):
         if os.path.exists(self.save_place):
             pass
         else:
-            os.makedirs(self.save_place)
+            os.makedirs(config['save_dir'])
 
         config1=config['args']
         self.input_size = config1['input_size']
@@ -58,10 +58,16 @@ class LSTM(nn.Module):
             self.hidden_network = nn.Sequential(
                 nn.Dropout(self.dropout), 
                 nn.Linear(self.hidden_size*2, self.hidden_size),
-                nn.Tanh(),
+                nn.ReLU(),
                 nn.Dropout(self.dropout),
-                nn.Linear(self.hidden_size,self.output_size), #两层hidden size不知道怎么设，先设了一个每次/2
-                nn.Tanh())
+                nn.Linear(self.hidden_size, self.hidden_size//2),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//2, self.hidden_size//4),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//4,self.output_size)) #两层hidden size不知道怎么设，先设了一个每次/2
+                
         else:
             self.hidden_network = nn.Sequential(
                 nn.Dropout(self.dropout),
@@ -177,5 +183,8 @@ def gen_model(train_loader, verify_loader, test_loader, config):
     '''
     args: train_loader, verify_loader, test_loader, config
     '''
-    model=LSTM(train_loader, verify_loader, test_loader, config)
+    # model=LSTM(train_loader, verify_loader, test_loader, config)
+    model = torch.load('save/mymodel.pt')
+    model.max_epoch = 1000
+    print(model)
     return model.to(device)

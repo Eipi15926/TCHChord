@@ -17,7 +17,7 @@
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 0,
-            "batch_len": 32
+            "batch_len": 16
         }
     },
     "test_data_loader": {
@@ -55,14 +55,14 @@
             "output_size": 12,
             "embed_size": 8,
             "hidden_size": 128,
-            "num_layers": 2,
+            "num_layers": 4,
             "dropout": 0.2,
             "bidirectional": true
         },
         "train": {
             "lr": 0.001,
-            "max_epochs": 100,
-            "early_stop": 100
+            "max_epochs": 1000,
+            "early_stop": 1000
         },
         "metric": {
             "lim_num": 3,

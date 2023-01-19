@@ -57,6 +57,7 @@ def main(config):
                       test_loader,
                       config=config['model'])
     model.Train()
+    model.test()
 
 # predict chord output and evaluate model by predict.py
 
