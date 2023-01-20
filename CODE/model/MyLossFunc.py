@@ -11,7 +11,7 @@ class MyLossFunc(nn.Module):
         for i in (0,lth):
             out1 = out[i]
             label1 = label[i]
-            loss =  loss + 1 - out1 * label1 /out1.sum()/label1.sum()
+            loss =  loss + 1 - (out1 * label1).sum() /out1.sum()/label1.sum()
         loss = Variable(loss, requires_grad=True)
         return
 
