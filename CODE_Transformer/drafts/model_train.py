@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.optim as optim
 #from metric import evaluation
 from metric import evaluation_simple
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") #这里保留的是参考代码的实现
 class Trans(nn.Module):
     def __init__(self, train_loader, verify_loader, test_loader,config):
@@ -41,11 +40,18 @@ class Trans(nn.Module):
                                   num_encoder_layers=self.num_encoder_layers,
                                   num_decoder_layers=self.num_decoder_layers,
                                   dim_feedforward=self.dim_feedforward,
-                                  dropout=self.dropout)
+                                  dropout=self.dropout,
+                                  custom_encoder= self.myencoder)
         #self.hidden_network=
+    def myencoder(self):
 
- 
-    def forward(self):
+
+
+    def mydecoder(self):
+
+
+    def forward(self,melody,chord,mask):
+        self.trans.forward(src=melody, tgt=chord ,tgt_mask=mask)
         return
 
     # 一个用于修改target的函数，在训练集里target就是chord
@@ -98,12 +104,12 @@ class Trans(nn.Module):
             for melody, chord in verify_loader:
                 melody = melody.to(device)
                 chord = chord.to(device)
-                target = [] #should be empty at first and add the latest prediction result each time?
+                target = chord #should be empty at first and add the latest prediction result each time?
                 lent = len(chord)
                 for i in range(lent):
                     mask = self.get_mask(i) #give i as the argument or what?
                     pred = self(melody,target,mask)
-                    target = [] #update target
+                    target = pred #update target
                 avg = avg + evaluation_simple(pred,chord,self.eval_config)
                 cnt = cnt+1
 
@@ -132,7 +138,7 @@ class Trans(nn.Module):
 
         #evalation mode on
         self.eval()
-        for melody, chord in verify_loader:
+        for melody, chord in self.verify_loader:
             melody = melody.to(device)
             chord = chord.to(device)
             #should be random at first and add the latest prediction result each time?
@@ -148,34 +154,7 @@ class Trans(nn.Module):
         print('Test set average accuracy:',avg/cnt)
         return
 
-        '''
-        train_loader = self.train_loader
-        verify_loader = self.verify_loader
-        lr = self.lr
-        MAX_EPOCH = self.max_epoch
 
-        criterion = nn.CrossEntropyLoss().to(device)
-        optimizer = optim.Adam(self.parameters(), lr)
-
-        for epoch in range(MAX_EPOCH):
-            self.batch_size = self.train_loader.batch_size
-            for melody, chord, target, mask in train_loader:
-                lent = len(chord)
-                output = []  # 应该是tensor 注意要改一下
-                melody = melody.to(device)
-                chord = chord.to(device)
-                target = chord  # 对训练来说是这样的
-                for i in range(lent):
-                    mask = get_mask(mask)
-                    #坏事了这个怎么改
-                    output_p = trmodel(melody, target, mask)
-                    output = func(output_p)
-                    target = output
-
-                loss = criterion(output, chord)
-                # 评估函数之后再改
-                print("loss=", loss)
-        '''
 def gen_model(train_loader, verify_loader, test_loader, config):
     '''
     args: train_loader, verify_loader, test_loader, config
