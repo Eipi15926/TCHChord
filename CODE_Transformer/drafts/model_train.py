@@ -84,7 +84,7 @@ class Trans(nn.Module):
                 target = chord  # 对训练来说是这样的
                 for i in range(lent):
                     mask = self.get_mask(i) #give i as the argument or what?
-                    output_p = self(melody, target, mask)
+                    output_p = self.trans(melody, target, mask)
                     output = self.func(output_p)
 
                 loss = criterion(output, chord)
