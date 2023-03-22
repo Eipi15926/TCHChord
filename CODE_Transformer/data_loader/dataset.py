@@ -118,7 +118,7 @@ class MidiDataset(Dataset):
             return data[0:batch_len]
         else:
             for i in range(batch_len - len(data)):
-                data.append(torch.tensor(0))
+                data.append(torch.tensor(2))
             return data
     @classmethod
     def vec2ind(cls, data):
