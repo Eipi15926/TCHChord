@@ -91,9 +91,6 @@ class MidiDataset(Dataset):
                 melody = self.transform(melody)
             if self.target_transform:
                 chord = self.target_transform(chord)
-            if self.batch_len:
-                melody = self.align(melody, self.batch_len)
-                chord = self.align(chord, self.batch_len)
 
             melody = torch.stack(melody)
             chord = torch.stack(chord)
@@ -146,6 +143,8 @@ class MidiDataset(Dataset):
         
 
         # 加上pad
+        if(len(data) > squeeze_length):
+            data = data[0:squeeze_length]
         while len(data) < squeeze_length:
             data.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
             
