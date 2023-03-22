@@ -22,6 +22,9 @@ class Trans(nn.Module):
         self.num_decoder_layers=config1['num_decoder_layers']
         self.dim_feedforward=config1['dim_feedforward']
         self.dropout=config1['dropout']
+        self.d_model=config1['d_model']
+        self.batch_first=config1['batch_first']
+        self.norm_first=config1['norm_first']
 
         #arguments of training process, should be modified according to need
         config2=config['train']
@@ -41,7 +44,10 @@ class Trans(nn.Module):
                                   num_encoder_layers=self.num_encoder_layers,
                                   num_decoder_layers=self.num_decoder_layers,
                                   dim_feedforward=self.dim_feedforward,
-                                  dropout=self.dropout)
+                                  dropout=self.dropout,
+                                  d_model=self.d_model,
+                                  batch_first=self.batch_first,
+                                  norm_first=self.norm_first)
         #self.hidden_network=
 
     def forward(self,melody,chord,mask):
