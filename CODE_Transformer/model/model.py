@@ -37,18 +37,37 @@ class Trans(nn.module):
         #define model
         #need some other arguments?
         #self.hidden_network=
-
-
-    def encoder(self):
+    def getmask(self,i):
         return
 
+    def encoder(self, input):
+        output = input
+        return output
 
-    def decoder(self):
-        return
+
+    def decoder(self,src,tgt,mask):
+        output = tgt
+        return output
 
 
-    def forward(self):
-        return
+    def forward(self,melody,chord,mask):
+        src = self.encoder(melody)
+        lent = len(melody)
+        output = []
+        if self.mode == train :#
+            tgt = chord
+            for i in range(0,lent):
+                mask = self.getmask(i)# to be finished
+                output = self.decoder(src,tgt,mask)
+
+        else:
+            tgt = []
+            for i in range(0,lent):
+                mask = self.getmask(i)
+                tgt = self.decoder(src,tgt,mask)
+            output = tgt
+        output_p = output# to be finished
+        return output_p
 
 
 def train(model_name):
