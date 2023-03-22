@@ -46,7 +46,8 @@ class Trans(nn.module):
 
 
     def decoder(self,src,tgt,mask):
-        output = tgt
+        dcdr = nn.TransformerDecoder(decoder_layer=nn.TransformerDecoderLayer(d_model),num_layers=self.num_decoder_layers)
+        output = dcdr(memory=src,tgt=tgt,tgt_mask=mask)
         return output
 
 
