@@ -36,35 +36,32 @@ class Trans(nn.Module):
 
         #define model
         #need some other arguments?
+        self.mask=None #init
         self.trans=nn.Transformer(nhead=self.nhead,
                                   num_encoder_layers=self.num_encoder_layers,
                                   num_decoder_layers=self.num_decoder_layers,
                                   dim_feedforward=self.dim_feedforward,
-                                  dropout=self.dropout,
-                                  custom_encoder= self.myencoder)
+                                  dropout=self.dropout)
         #self.hidden_network=
-    def myencoder(self):
-
-
-
-    def mydecoder(self):
-
 
     def forward(self,melody,chord,mask):
         self.trans.forward(src=melody, tgt=chord ,tgt_mask=mask)
         return
 
     # 一个用于修改target的函数，在训练集里target就是chord
-    def get_mask(self,mask):
+    def get_ori_mask(self,sz):
+        mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
+        mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
         return mask
-
+    def get_mask(self,i):
+        return self.mask[i]
 
     def func(self,output_p):
         output = output_p
         return output
 
 
-    def train(self, device):
+    def Train(self, device):
         train_loader = self.train_loader
         verify_loader = self.verify_loader
         lr = self.lr
@@ -81,6 +78,7 @@ class Trans(nn.Module):
                 lent = len(chord)
                 melody = melody.to(device)
                 chord = chord.to(device)
+                self.mask=self.get_ori_mask(lent)
                 target = chord  # 对训练来说是这样的
                 for i in range(lent):
                     mask = self.get_mask(i) #give i as the argument or what?
@@ -106,6 +104,7 @@ class Trans(nn.Module):
                 chord = chord.to(device)
                 target = chord #should be empty at first and add the latest prediction result each time?
                 lent = len(chord)
+                self.mask=self.get_ori_mask(lent)
                 for i in range(lent):
                     mask = self.get_mask(i) #give i as the argument or what?
                     pred = self(melody,target,mask)
@@ -131,7 +130,7 @@ class Trans(nn.Module):
         return
 
 
-    def test(self, device):
+    def Test(self, device):
         avg=0
         cnt=0
         self.batch_size = self.verify_loader.batch_size
@@ -144,6 +143,7 @@ class Trans(nn.Module):
             #should be random at first and add the latest prediction result each time?
             target = torch.rand(()) #remember to add size of the tensor
             lent = len(chord)
+            self.mask=self.get_ori_mask(lent)
             for i in range(lent):
                 mask = self.get_mask(i) #give i as the argument or what?
                 pred = self(melody,target,mask)
