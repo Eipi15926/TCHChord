@@ -1,0 +1,72 @@
+{
+    "name": "LSTM",
+    "data": {
+        "data_folder": "data/",
+        "classify_folder": "data/classify",
+        "parse_path": "data/parse_output",
+        "train_scale": 0.8,
+        "val_scale": 0.1,
+        "test_scale": 0.1,
+        "use_one_hot": false
+    },
+    "train_data_loader": {
+        "name": "MidiDataLoader",
+        "args": {
+            "data_path": "data/parse_output/train.pkl",
+            "batch_size": 64,
+            "shuffle": true,
+            "validation_split": 0.1,
+            "num_workers": 0,
+            "batch_len": 16
+        }
+    },
+    "test_data_loader": {
+        "name": "MidiDataLoader",
+        "args": {
+            "data_path": "data/parse_output/test.pkl",
+            "batch_size": 1,
+            "shuffle": false,
+            "validation_split": 0.0,
+            "num_workers": 0,
+            "batch_len": 0
+        }
+    },
+    "val_data_loader": {
+        "name": "MidiDataLoader",
+        "args": {
+            "data_path": "data/parse_output/val.pkl",
+            "batch_size": 1,
+            "shuffle": false,
+            "validation_split": 0.0,
+            "num_workers": 0,
+            "batch_len": 0
+        }
+    },
+    "dataloader": {
+        "batch_size": 1,
+        "shuffle": false
+    },
+    "model": {
+        "name": "LSTM",
+        "save_dir": "save/",
+        "save_name": "mymodel.pt",
+        "args": {
+            "input_size": 12,
+            "output_size": 12,
+            "embed_size": 8,
+            "hidden_size": 128,
+            "num_layers": 4,
+            "dropout": 0.2,
+            "bidirectional": true
+        },
+        "train": {
+            "lr": 0.001,
+            "max_epochs": 1000,
+            "early_stop": 1000
+        },
+        "metric": {
+            "lim_num": 3,
+            "lim": 0.5
+        }
+    }
+}
