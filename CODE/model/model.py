@@ -31,6 +31,11 @@ class PositionalEncoding(nn.Module):
         x = x + self.pe[:x.size(0)]
         return self.dropout(x)
 
+
+def generate_square_subsequent_mask(sz: int) -> Tensor:
+    """Generates an upper-triangular matrix of -inf, with zeros on diag."""
+    return torch.triu(torch.ones(sz, sz) * float('-inf'), diagonal=1)
+
 class TransformerModel(nn.Module):
     #论文提供的参数：
     # 2层LSTM
@@ -83,6 +88,7 @@ class TransformerModel(nn.Module):
         self.pos_encoder = PositionalEncoding(self.d_model, self.dropout)
         encoder_layers = nn.TransformerEncoderLayer(self.d_model, self.nhead, self.d_hid, self.dropout)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layers, self.nlayers)
+        
         # self.decoder = nn.Linear(self.d_model, self.output_size)
         self.decoder = nn.Sequential(nn.Linear(self.d_model, self.hidden_size),                                     
                                      nn.ReLU(),
@@ -121,7 +127,7 @@ class TransformerModel(nn.Module):
         #         nn.Linear(self.hidden_size/2,self.output_size),
         #         nn.Tanh())
         
-    def forward(self, data, src_mask=None):
+    def forward(self, data, src_mask: Tensor):
         #没有分成批所以应该是单个序列跑的没有batch
         #batch_size = data.size(0) #序列长度
         #print(batch_size)
@@ -136,7 +142,7 @@ class TransformerModel(nn.Module):
         #     c0 = torch.randn(self.num_layers, self.batch_size, self.hidden_size).to(device)
         # out,(_,_)= self.lstm(data, (h0,c0))
         out = self.pos_encoder(data)
-        out = self.transformer_encoder(out, src_mask)
+        out = self.transformer_encoder(out,src_mask)
         output = self.decoder(out)
         chord_out = torch.sigmoid(output) #最后用sigmoid输出概率
         return chord_out
@@ -162,6 +168,10 @@ class TransformerModel(nn.Module):
 
         stop_cnt=0
         pre_acc=0
+
+        
+        
+
         for epoch in range(MAX_EPOCH):
             self.train()
             self.batch_size = self.train_loader.batch_size
@@ -170,10 +180,11 @@ class TransformerModel(nn.Module):
                 # chord=torch.tensor(chord).to(torch.float32)
                 # melody = torch.tensor(melody)
                 # chord = torch.tensor(chord)
+                src_mask = generate_square_subsequent_mask(melody).to(device)
                 melody=melody.to(device)
                 chord=chord.to(device)
 
-                pred=self(melody)
+                pred=self(melody,src_mask)
                 loss=criterion(pred,chord)
 
                 optimizer.zero_grad()
@@ -217,13 +228,15 @@ class TransformerModel(nn.Module):
         cnt = 0
         self.batch_size = self.test_loader.batch_size
         self.eval()
+        
         for melody, chord in self.test_loader:
             # melody=torch.tensor(melody).to(torch.float32)
             # chord=torch.tensor(chord).to(torch.float32)
+            src_mask = generate_square_subsequent_mask(melody).to(device)
             melody = melody.to(device)
             chord = chord.to(device)
 
-            pred=self(melody)
+            pred=self(melody,src_mask)
             avg=avg+evaluation(pred,chord,self.eval_config) #调用验证函数
             cnt=cnt+1
 
