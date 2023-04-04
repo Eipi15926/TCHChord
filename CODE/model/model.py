@@ -32,9 +32,16 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 
-def generate_square_subsequent_mask(sz: int) -> Tensor:
-    """Generates an upper-triangular matrix of -inf, with zeros on diag."""
-    return torch.triu(torch.ones(sz, sz) * float('-inf'), diagonal=1)
+def generate_padding_mask(seq: Tensor,batchsize :int,length: int) -> Tensor:
+    #产生一个2维列表
+    key_padding_mask = torch.zeros((batchsize,length))
+    
+    #如果是则变为inf
+    key_padding_mask[(seq == 0).sum(2)==12] = -torch.inf
+    
+    
+    return key_padding_mask
+
 
 class TransformerModel(nn.Module):
     #论文提供的参数：
@@ -73,6 +80,7 @@ class TransformerModel(nn.Module):
         self.d_hid = config1['d_hid']
         self.nlayers = config1['nlayers']
 
+
         config2=config['train']
         self.config2 = config2
         self.lr=config2['lr']
@@ -80,15 +88,17 @@ class TransformerModel(nn.Module):
         self.early_stop = config2['early_stop']
         self.loss_fn = config2['loss_fn']
 
+
         self.train_loader=train_loader
         self.verify_loader=verify_loader
         self.test_loader=test_loader
         self.batch_size = train_loader.batch_size
+        self.batch_len = train_loader.batch_len
         
         self.pos_encoder = PositionalEncoding(self.d_model, self.dropout)
-        encoder_layers = nn.TransformerEncoderLayer(self.d_model, self.nhead, self.d_hid, self.dropout)
+        encoder_layers = nn.TransformerEncoderLayer(self.d_model, self.nhead, self.d_hid, self.dropout, batch_first=True)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layers, self.nlayers)
-        
+
         # self.decoder = nn.Linear(self.d_model, self.output_size)
         self.decoder = nn.Sequential(nn.Linear(self.d_model, self.hidden_size),                                     
                                      nn.ReLU(),
@@ -127,7 +137,7 @@ class TransformerModel(nn.Module):
         #         nn.Linear(self.hidden_size/2,self.output_size),
         #         nn.Tanh())
         
-    def forward(self, data, src_mask: Tensor):
+    def forward(self, data,benchsize,seq_length):
         #没有分成批所以应该是单个序列跑的没有batch
         #batch_size = data.size(0) #序列长度
         #print(batch_size)
@@ -142,7 +152,8 @@ class TransformerModel(nn.Module):
         #     c0 = torch.randn(self.num_layers, self.batch_size, self.hidden_size).to(device)
         # out,(_,_)= self.lstm(data, (h0,c0))
         out = self.pos_encoder(data)
-        out = self.transformer_encoder(out,src_mask)
+        src_mask = generate_padding_mask(data,benchsize,seq_length).to(device)
+        out = self.transformer_encoder(out,None,src_mask)#todo
         output = self.decoder(out)
         chord_out = torch.sigmoid(output) #最后用sigmoid输出概率
         return chord_out
@@ -180,11 +191,11 @@ class TransformerModel(nn.Module):
                 # chord=torch.tensor(chord).to(torch.float32)
                 # melody = torch.tensor(melody)
                 # chord = torch.tensor(chord)
-                src_mask = generate_square_subsequent_mask(melody).to(device)
+                
                 melody=melody.to(device)
                 chord=chord.to(device)
 
-                pred=self(melody,src_mask)
+                pred=self(melody,self.batch_size,self.batch_len)
                 loss=criterion(pred,chord)
 
                 optimizer.zero_grad()
@@ -204,7 +215,8 @@ class TransformerModel(nn.Module):
                 melody = melody.to(device)
                 chord = chord.to(device)
 
-                pred=self(melody)
+                
+                pred=self(melody,self.batch_size,self.batch_len)
                 avg=avg+evaluation_simple(pred,chord,self.eval_config) #调用验证函数
                 cnt=cnt+1
                 
@@ -232,11 +244,11 @@ class TransformerModel(nn.Module):
         for melody, chord in self.test_loader:
             # melody=torch.tensor(melody).to(torch.float32)
             # chord=torch.tensor(chord).to(torch.float32)
-            src_mask = generate_square_subsequent_mask(melody).to(device)
+            
             melody = melody.to(device)
             chord = chord.to(device)
 
-            pred=self(melody,src_mask)
+            pred=self(melody,self.batch_size,self.batch_len)
             avg=avg+evaluation(pred,chord,self.eval_config) #调用验证函数
             cnt=cnt+1
 
