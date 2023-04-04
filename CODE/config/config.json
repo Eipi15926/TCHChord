@@ -28,7 +28,7 @@
             "shuffle": false,
             "validation_split": 0.0,
             "num_workers": 0,
-            "batch_len": 0
+            "batch_len": 16
         }
     },
     "val_data_loader": {
@@ -39,7 +39,7 @@
             "shuffle": false,
             "validation_split": 0.0,
             "num_workers": 0,
-            "batch_len": 0
+            "batch_len": 16
         }
     },
     "dataloader": {
