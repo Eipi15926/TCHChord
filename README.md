@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This implementation corresponds to the research paper [https://www.researchgate.net/publication/374821772_Chord_Generation_Based_on_Transformer_and_Color_Harmony_Theory]. AI transforms music with widespread applications. The paper introduces a Transformer-based chord model, achieving the functionality of generating corresponding chords for a given melody. By incorporating Color Harmony Theory, it aims for superior output through a simple model and enhanced scalability using a template mapping method.
+This implementation corresponds to the research paper [Chord Generation Based on Transformer and Color Harmony Theory](https://doi.org/10.1109/ICNC-FSKD59587.2023.10281125). AI transforms music with widespread applications. The paper introduces a Transformer-based chord model, achieving the functionality of generating corresponding chords for a given melody. By incorporating Color Harmony Theory, it aims for superior output through a simple model and enhanced scalability using a template mapping method.
 
 The architecture of the model is illustrated in the following diagram:
 
