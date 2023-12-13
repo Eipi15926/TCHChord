@@ -83,7 +83,7 @@ class MidiDataset(Dataset):
             return data[0:batch_len]
         else:
             for i in range(batch_len - len(data)):
-                data.append([0]*12)
+                data.append([1]*12)
             return data
 
 if __name__ == '__main__':

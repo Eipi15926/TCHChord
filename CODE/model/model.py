@@ -40,7 +40,7 @@ def generate_padding_mask(seq: Tensor, batchsize: int, length: int) -> Tensor:
     key_padding_mask = torch.zeros((batchsize, length))
 
     # 如果是则变为inf
-    key_padding_mask[(seq == 0).sum(2) == 12] = -torch.inf
+    key_padding_mask[(seq == 1).sum(2) == 12] = -torch.inf
 
     return key_padding_mask
 
@@ -158,6 +158,8 @@ class TransformerModel(nn.Module):
         src_mask = generate_padding_mask(
             data, benchsize, seq_length).to(device)
         out = self.transformer_encoder(out, None, src_mask)  # todo
+        # out = self.transformer_encoder(out)
+        #print("out_trans_encoder:{}".format((out)))
         output = self.decoder(out)
         chord_out = torch.sigmoid(output)  # 最后用sigmoid输出概率
         return chord_out
@@ -216,7 +218,6 @@ class TransformerModel(nn.Module):
                 # chord=torch.tensor(chord).to(torch.float32)
                 melody = melody.to(device)
                 chord = chord.to(device)
-
                 pred = self(melody, self.batch_size, self.batch_len)
                 avg = avg+evaluation_simple(pred,
                                             chord, self.eval_config)  # 调用验证函数

@@ -11,7 +11,7 @@ class MidiDataLoader(DataLoader):
         validation_split = config['validation_split']
         num_workers = config['num_workers']
         batch_len = config['batch_len']
-
+        self.batch_len = batch_len
         dataset_config={'data_path': data_path, 'batch_len': batch_len, 'transform': None, 'target_transform': None, 'use_one_hot': False}
         midi_dataset = MidiDataset(dataset_config)
         self.validation_split = validation_split
